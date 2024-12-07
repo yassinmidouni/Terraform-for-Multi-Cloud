@@ -15,7 +15,7 @@ provider "aws" {
   region = "us-west-2"
 }
 
-resource "aws_instance" "example" {
+resource "aws_instance" "YassinInstance" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
 }
@@ -60,7 +60,7 @@ provider "aws" {
   region = "us-west-2"
 }
 
-resource "aws_instance" "example" {
+resource "aws_instance" "YassinInstance" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
 }
