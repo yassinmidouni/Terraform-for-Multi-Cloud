@@ -15,7 +15,7 @@ provider "aws" {
   region = "us-west-2"
 }
 
-resource "aws_instance" "YassinInstance" {
+resource "aws_instance" "example" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
 }
@@ -60,7 +60,7 @@ provider "aws" {
   region = "us-west-2"
 }
 
-resource "aws_instance" "YassinInstance" {
+resource "aws_instance" "example" {
   ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
 }
@@ -111,29 +111,163 @@ Reuse community modules 🛒 or build your own for faster provisioning.
 
 ---
 
-## ⚔️ **Terraform vs. Other IaC Tools**
+# 🌍 **Terraform for Multi-Cloud: AWS + Azure Integration**
 
-| Feature               | Terraform    | Ansible     | CloudFormation | Pulumi      |
-|-----------------------|--------------|-------------|----------------|-------------|
-| **Open Source**       | ✅            | ✅           | ❌              | ✅           |
-| **Cloud Agnostic**    | ✅            | ✅           | ❌              | ✅           |
-| **Declarative Syntax**| ✅            | 🟡 Partial  | ✅              | ✅           |
-| **State Management**  | ✅            | ❌           | ✅              | ✅           |
-| **Execution Plan**    | ✅            | ❌           | ✅              | ✅           |
+Harness the full potential of **Terraform** to manage resources across multiple cloud providers like AWS and Azure. This tutorial will guide you step-by-step to provision resources on both platforms simultaneously. Get ready to simplify multi-cloud management with a unified tool! 🌟
 
 ---
 
-## 📚 **Resources to Learn More**
+## 🛠️ **Prerequisites**
 
-- 🌐 [Official Terraform Documentation](https://www.terraform.io/docs)
-- 🎥 [HashiCorp YouTube Channel](https://www.youtube.com/c/HashiCorp)
-- 🛒 [Terraform Registry](https://registry.terraform.io/) (Browse reusable modules)
-- 🧑‍🤝‍🧑 Terraform Community Forums
+### ✅ **Install Terraform**
+Make sure Terraform is installed on your machine. Verify with:
+```bash
+terraform -version
+```
+
+### ✅ **Configure Cloud CLIs**
+1. **AWS CLI**:
+   ```bash
+   aws configure
+   ```
+   Provide your access key, secret key, default region, and output format.
+
+2. **Azure CLI**:
+   ```bash
+   az login
+   ```
+   Authenticate with your Azure account.
 
 ---
 
-## ✨ **Ready to Terraform Your World?**
+## 📂 **Project Structure**
 
-Dive into Terraform and experience the power of Infrastructure as Code! With a little practice, you’ll be managing complex setups like a pro. 💪
+Create the following directory structure for clarity:
+```
+.
+├── main.tf
+├── providers.tf
+├── variables.tf
+```
 
-Happy Terraforming! 🌱
+- `main.tf`: Defines the resources for AWS and Azure.
+- `providers.tf`: Configures multiple providers (AWS and Azure).
+- `variables.tf`: Stores reusable variables.
+
+---
+
+## 🖋️ **Step 1: Configure Providers**
+
+In `providers.tf`, define AWS and Azure providers:
+```hcl
+provider "aws" {
+  region = var.aws_region
+}
+
+provider "azurerm" {
+  features {}
+}
+```
+
+---
+
+## 🖋️ **Step 2: Define Variables**
+
+In `variables.tf`, declare input variables for AWS and Azure settings:
+```hcl
+variable "aws_region" {
+  default = "us-west-2"
+}
+
+variable "azure_location" {
+  default = "East US"
+}
+```
+
+---
+
+## 🖋️ **Step 3: Provision Resources**
+
+In `main.tf`, define resources for AWS and Azure. For example:
+
+### AWS EC2 Instance:
+```hcl
+resource "aws_instance" "aws_server" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+}
+```
+
+### Azure Resource Group and Virtual Machine:
+```hcl
+resource "azurerm_resource_group" "azure_group" {
+  name     = "MyResourceGroup"
+  location = var.azure_location
+}
+
+resource "azurerm_linux_virtual_machine" "azure_vm" {
+  name                = "MyLinuxVM"
+  location            = azurerm_resource_group.azure_group.location
+  resource_group_name = azurerm_resource_group.azure_group.name
+  size                = "Standard_DS1_v2"
+
+  admin_username      = "adminuser"
+  admin_password      = "P@ssw0rd123!"
+
+  network_interface_ids = ["<NETWORK_INTERFACE_ID>"]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+}
+```
+
+---
+
+## 🛠️ **Step 4: Initialize Terraform**
+
+Run the following command to download provider-specific plugins:
+```bash
+terraform init
+```
+
+---
+
+## 🛠️ **Step 5: Plan and Apply**
+
+### Preview Changes:
+```bash
+terraform plan
+```
+This command will show the resources Terraform will create.
+
+### Apply Configuration:
+```bash
+terraform apply
+```
+Confirm with `yes` to provision the resources across AWS and Azure.
+
+---
+
+## 🗑️ **Step 6: Clean Up Resources**
+
+When you're done, destroy the resources to avoid unnecessary charges:
+```bash
+terraform destroy
+```
+
+---
+
+## 🔮 **Tips for Multi-Cloud Terraform**
+
+- **Separate State Files:** Use workspaces or backend configurations to maintain separate state files for each cloud provider.
+- **Use Modules:** Modularize your configurations to reuse them across different environments.
+
